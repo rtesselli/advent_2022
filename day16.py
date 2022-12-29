@@ -49,29 +49,31 @@ def solve(graph: Graph, distances: dict[tuple[str, str], int]) -> int:
         return sum((mins_left - distance) * graph[to]["flow_rate"] for to, distance in reachables.items())
 
     @cache
-    def rec_solve(node: str, mins_left: int, opened: frozenset[str], previous_node: str) -> int:
+    def rec_solve(node: str, mins_left: int, opened: frozenset[str], previous_node: str) -> tuple[int, list[str]]:
         data = graph[node]
         if mins_left == 0:
-            return 0
+            return 0, [previous_node, node]
         curr_score = 0
         if node == previous_node:
             curr_score += mins_left * data["flow_rate"]
             opened = opened | {node}
         if not positive_flow - opened:
-            return curr_score
+            return curr_score, [previous_node, node]
         actions = [neighbor for neighbor in data['neighbors'] if neighbor != previous_node]
         if data["flow_rate"] > 0 and node not in opened:
             actions.append(node)
         estimated_actions = [(action, estimate(action, mins_left - 1, opened)) for action in actions]
         best_score = -1
+        best_path = []
         for action, max_estimate in sorted(estimated_actions, key=lambda x: x[1], reverse=True):
-            if best_score < max_estimate:
-                score = rec_solve(action, mins_left - 1, frozenset(opened), node)
+            if best_score < max_estimate and max_estimate > 0:
+                score, path = rec_solve(action, mins_left - 1, frozenset(opened), node)
                 if score > best_score:
                     best_score = score
+                    best_path = path
         if best_score > -1:
-            return best_score + curr_score
-        return curr_score
+            return best_score + curr_score, [previous_node] + best_path
+        return curr_score, [previous_node, node]
 
     start = list(graph.keys())[0]
     return rec_solve(start, 30, frozenset(), '')
