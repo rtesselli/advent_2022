@@ -41,7 +41,8 @@ def all_distances(graph: dijkstar.Graph) -> dict[tuple[str, str], int]:
 def solve(graph: Graph, distances: dict[tuple[str, str], int]) -> int:
     positive_flow = {node for node in graph.keys() if graph[node]["flow_rate"] > 0}
 
-    def estimate(action: str, mins_left: int, opened: set[str] | frozenset[str]) -> int:
+    @cache
+    def estimate(action: str, mins_left: int, opened: frozenset[str]) -> int:
         distances_from_action = {to: distance for (from_, to), distance in distances.items() if from_ == action}
         openables = {to: distance for to, distance in distances_from_action.items() if
                      to not in opened and graph[to]['flow_rate'] > 0}
