@@ -100,19 +100,13 @@ def main():
     sensors, beacons = unzip(lines)
     sensors = list(sensors)
     beacons = list(beacons)
-    # print(len(remove_beacons(project(sensors, beacons, 10), beacons, 10)))
-    # print(len(remove_beacons(project(sensors, beacons, 2000000), beacons, 2000000)))
+    print(len(remove_beacons(project(sensors, beacons, 2000000), beacons, 2000000)))
 
     for line in tqdm(range(0, 4000000 + 1)):
         result = add_beacons(project(sensors, beacons, line), beacons, line)
-        # if len(result) < max(result) - min(result) + 1:
         if len(result) > 1:
-            print(line)
-            print(result)
-            # line: 2855041
-            # value: 2911363
-            # result: 4000000 * 2911363 + 2855041
-            # my output to fix 2855041 [(-419935, 2911362), (2911364, 4327534)]
+            print((result[0][1] + 1) * 4000000 + line)
+            return
 
 
 if __name__ == '__main__':
